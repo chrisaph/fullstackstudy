@@ -8,14 +8,16 @@ import Practice from './views/Practice'
 import Notebook from './views/Notebook'
 import Toolkit from './views/Toolkit'
 import Flashcards from './views/Flashcards'
+import Quiz from './views/Quiz'
 import TimerWidget from './views/Timer'
 import LangTab from './views/LangTab'
 import { LangContext, toCsharp, type Lang } from './lib/lang'
 import Reflection from './views/Reflection'
 import CloudSync from './views/CloudSync'
+import QuickNotes from './views/QuickNotes'
 import { PhClock, dayKey, useNow } from './lib/time'
 
-const NAV = [['dashboard', 'Overview'], ['scorecard', 'Scorecard'], ['pathways', 'Pathways'], ['practice', 'Practice'], ['notebook', 'Notebook'], ['reflection', 'Reflection'], ['toolkit', 'Toolkit'], ['flashcards', 'Flashcards'], ['lang', 'Language']] as const
+const NAV = [['dashboard', 'Overview'], ['scorecard', 'Scorecard'], ['pathways', 'Pathways'], ['practice', 'Practice'], ['notebook', 'Notebook'], ['reflection', 'Reflection'], ['toolkit', 'Toolkit'], ['flashcards', 'Flashcards'], ['quiz', 'Quiz'], ['lang', 'Language']] as const
 
 export default function App() {
   const [lang, setLang] = useLocal<Lang>('fs.lang', 'python')
@@ -84,8 +86,10 @@ export default function App() {
         {view === 'reflection' && <Reflection log={log} setLog={setLog} mode={mode} setMode={setModeAndBase} baseDay={baseDay} resetNow={() => setBaseDay(today)} today={today} refl={refl} setRefl={setRefl} />}
         {view === 'toolkit' && <Toolkit />}
         {view === 'flashcards' && <Flashcards />}
+        {view === 'quiz' && <Quiz key={lang} />}
         {view === 'lang' && <LangTab key={lang} />}
       </main>
+      <QuickNotes notes={notes} setNotes={setNotes} openNotebook={() => go('notebook')} />
       <footer className="border-t border-line px-5 py-6 text-center text-xs text-muted">
         <p>Build without AI. Explain every line.</p>
         <CloudSync />

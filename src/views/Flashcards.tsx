@@ -1,28 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { HOPS, COOKIE_STEPS, COOKIE_FLAGS, DEVTOOLS, SECURITY, SECRET_RESPONSE, UX, TOPICS, VARK, REVIEW_PROMPTS, type Level } from '../lib/data'
+import { CORE_CONCEPTS, HOPS, COOKIE_STEPS, COOKIE_FLAGS, DEVTOOLS, SECURITY, SECRET_RESPONSE, UX, TOPICS, VARK, REVIEW_PROMPTS, type Level } from '../lib/data'
 import { PY_NOTES, CS_NOTES, useLang } from '../lib/lang'
 import { useLocal } from '../lib/store'
 import { Card, Title, Btn } from './ui'
 
 type FC = { id: string; deck: string; q: string; a: string; code?: string }
-const CORE: [string, string][] = [
-  ['What is the difference between authentication and authorization?', 'Authentication proves who you are (login). Authorization decides what you may do (permissions). A valid token that lets you read another user\'s order is an authorization bug.'],
-  ['What is an N+1 query?', 'One query loads N parent rows, then one extra query per row loads a relation. Fix by loading relations together (joins / eager loading) and watch for it behind serializers.'],
-  ['CSRF vs XSS?', 'CSRF tricks a logged-in browser into sending an unwanted request (defend: SameSite cookies, CSRF tokens). XSS injects script into your page (defend: output encoding, CSP, HttpOnly cookies).'],
-  ['What does a 401 mean versus a 403?', '401: not authenticated (missing/invalid credentials). 403: authenticated but not allowed.'],
-  ['What are the common HTTP status families?', '2xx success, 3xx redirect, 4xx client error, 5xx server error. 201 Created, 204 No Content, 400 Bad Request, 404 Not Found, 409 Conflict, 429 Too Many Requests.'],
-  ['PUT vs PATCH vs POST?', 'POST creates (not idempotent). PUT replaces a resource (idempotent). PATCH partially updates.'],
-  ['What is a database index and its cost?', 'A sorted structure (often a B-tree) that speeds lookups and ordering. Costs storage and slows writes.'],
-  ['What does ACID stand for?', 'Atomicity, Consistency, Isolation, Durability: the guarantees of a transaction.'],
-  ['What is the event loop?', 'JavaScript runs one call stack. Async callbacks queue up; microtasks (promises) run before the next macrotask (timers, I/O).'],
-  ['Why is client-side validation not security?', 'The client is untrusted and can be bypassed. Always validate on the server.'],
-  ['Why do small commits matter?', 'They are easy to review, revert, bisect, and explain. Mix refactors and features and review becomes impossible.'],
-  ['Unit vs integration vs end-to-end test?', 'Unit: one piece in isolation. Integration: pieces together (e.g. view + DB). End-to-end: the whole system through the UI. Prefer many units, fewer E2E.'],
-  ['What is the 12-factor stance on config?', 'Store config in environment variables, never in code. Keep dev and prod identical except for config.'],
-  ['Why is DEBUG=True in production a catastrophe?', 'It leaks stack traces, settings and SQL to attackers.'],
-  ['What is a build step and why does the front-end have one?', 'Bundling, transpiling and minifying code for browsers. Back-ends usually run source directly.'],
-]
-
 export default function Flashcards() {
   const { lang, t } = useLang()
   const [custom, setCustom] = useLocal<FC[]>('fs.fc.custom', [])
@@ -38,7 +20,7 @@ export default function Flashcards() {
 
   const cards = useMemo<FC[]>(() => {
     const out: FC[] = []
-    CORE.forEach(([q, a], k) => out.push({ id: `core${k}`, deck: 'Core concepts', q: t(q), a: t(a) }))
+    CORE_CONCEPTS.forEach(([q, a], k) => out.push({ id: `core${k}`, deck: 'Core concepts', q: t(q), a: t(a) }))
     HOPS.forEach(([n, d]) => out.push({ id: `hop${n}`, deck: 'Request path', q: `What happens at the "${n}" hop?`, a: t(d) }))
     COOKIE_STEPS.forEach(([n, d]) => out.push({ id: `ck${n}`, deck: 'Cookies', q: `Cookie lifecycle: "${n}"?`, a: d }))
     COOKIE_FLAGS.forEach(([n, d]) => out.push({ id: `cf${n}`, deck: 'Cookies', q: `What does the ${n} cookie attribute do?`, a: d }))

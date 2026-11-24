@@ -21,9 +21,17 @@ export function useLocal<T>(key: string, init: T) {
       if (detail?.key === key) setV(detail.value as T)
     }
     window.addEventListener('fs:restore', restore)
-    return () => window.removeEventListener('fs:restore', restore)
+    window.addEventListener('fs:value', restore)
+    return () => {
+      window.removeEventListener('fs:restore', restore)
+      window.removeEventListener('fs:value', restore)
+    }
   }, [key])
   return [v, setV] as const
+}
+
+export function broadcastLocalValue<T>(key: string, value: T) {
+  window.dispatchEvent(new CustomEvent('fs:value', { detail: { key, value } }))
 }
 
 export type Note = { id: string; title: string; tag: string; body: string; at: number }

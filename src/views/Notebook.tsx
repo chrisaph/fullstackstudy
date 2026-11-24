@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocal, type Note } from '../lib/store'
+import { broadcastLocalValue, useLocal, type Note } from '../lib/store'
 import { useLang } from '../lib/lang'
 import { Card, Title, Btn } from './ui'
 
@@ -17,15 +17,27 @@ export default function Notebook({ notes, setNotes }: { notes: Note[]; setNotes:
   const [manage, setManage] = useState(false)
   const [newCat, setNewCat] = useState('')
   const [delCat, setDelCat] = useState<string | null>(null)
-  const addCat = () => { const c = newCat.trim(); if (c && !tags.includes(c)) setTags((p) => [...p, c]); setNewCat('') }
+  const addCat = () => {
+    const c = newCat.trim()
+    if (c && !tags.includes(c)) {
+      const updated = [...tags, c]
+      setTags(updated)
+      broadcastLocalValue('fs.noteCats', updated)
+    }
+    setNewCat('')
+  }
   const renameCat = (old: string, name: string) => {
     const n = name.trim(); if (!n || n === old || tags.includes(n)) return
-    setTags((p) => p.map((x) => (x === old ? n : x)))
+    const updated = tags.map((x) => x === old ? n : x)
+    setTags(updated)
+    broadcastLocalValue('fs.noteCats', updated)
     setNotes((p) => p.map((x) => (x.tag === old ? { ...x, tag: n } : x)))
     if (tag === old) setTag(n)
   }
   const removeCat = (c: string) => {
-    setTags((p) => p.filter((x) => x !== c))
+    const updated = tags.filter((x) => x !== c)
+    setTags(updated)
+    broadcastLocalValue('fs.noteCats', updated)
     setNotes((p) => p.map((x) => (x.tag === c ? { ...x, tag: 'uncategorized' } : x)))
     if (tag === c) setTag('All'); setDelCat(null)
   }
