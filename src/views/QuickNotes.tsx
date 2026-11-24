@@ -195,7 +195,7 @@ export default function QuickNotes({ notes, setNotes, openNotebook }: {
               placeholder="Write a note…" className="max-h-32 min-h-16 w-full resize-y rounded-xl border border-line bg-paper p-3 text-base leading-relaxed outline-none focus:border-accent" />
             <div className="mt-2 flex items-center justify-between gap-2">
               <button type="button" onClick={() => { openNotebook(); setOpen(false) }} className="min-h-10 rounded-lg px-3 text-sm font-medium text-muted underline underline-offset-2 hover:text-ink">Open notebook</button>
-              <button type="submit" disabled={!draft.trim()} className="min-h-10 rounded-lg bg-ink px-4 text-sm font-semibold text-paper hover:bg-accent disabled:opacity-40">{saveMode === 'current' ? 'Add to note' : 'Create note'}</button>
+              <button type="submit" disabled={!draft.trim()} className={`min-h-10 rounded-lg px-4 text-sm font-semibold text-paper disabled:opacity-40 ${saveMode === 'current' ? 'bg-accent hover:bg-ink' : 'bg-ink hover:bg-accent'}`}>{saveMode === 'current' ? 'Add to note' : 'Create note'}</button>
             </div>
           </form>
         </section>

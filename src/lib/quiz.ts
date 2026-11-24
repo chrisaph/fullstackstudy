@@ -2,7 +2,7 @@ import {
   CORE_CONCEPTS, COOKIE_FLAGS, COOKIE_STEPS, DEVTOOLS, HOPS, MISTAKES, PROBLEMS, PROJECTS, ROADMAP,
   SCORE_MEANING, SECTIONS, SECURITY, SECRET_RESPONSE, TOPICS, UX, VARK,
 } from './data'
-import { CS_GROUPS, CS_NOTES, PY_GROUPS, PY_NOTES, type Lang } from './lang'
+import { CS_NOTES, PY_NOTES, type Lang } from './lang'
 
 export type QuizChoice = { text: string; correct: boolean; explanation: string }
 export type QuizQuestion = { id: string; category: string; prompt: string; choices: QuizChoice[] }
@@ -196,23 +196,12 @@ export function buildQuizBank(lang: Lang, translate: (text: string) => string): 
     MISTAKES.filter((_, itemIndex) => itemIndex !== index).map((item) => ({ text: translate(item), explanation: `That is another listed pitfall, but it does not match the specific issue in this question.` })),
   )))
 
-  const groups = lang === 'python' ? PY_GROUPS : CS_GROUPS
   const lessons = lang === 'python' ? PY_NOTES : CS_NOTES
   const languageName = lang === 'python' ? 'Python' : 'C#'
-  groups.forEach((group) => group.topics.forEach((topic, index) => {
-    questions.push(makeQuestion(
-      `language-map-${lang}-${group.title}-${index}`, `${languageName} · ${group.title}`,
-      `In the ${languageName} learning map, which category includes “${topic}”?`, group.title,
-      `“${topic}” is included in the ${group.title} category in the ${languageName} learning map.`,
-      groups.filter((item) => item.title !== group.title).map((item) => ({ text: item.title, explanation: `The learning map places “${topic}” under ${group.title}, not ${item.title}.` })),
-    ))
-  }))
-
   const lessonRows = Object.entries(lessons)
   lessonRows.forEach(([title, lesson]) => {
-    const group = groups.find((item) => item.topics.includes(title))?.title ?? `${languageName} Tutorial`
     questions.push(makeQuestion(
-      `lesson-${lang}-${title}`, `${languageName} · ${group}`,
+      `lesson-${lang}-${title}`, `${languageName} topics`,
       `Which statement correctly describes “${title}”?`, lesson.text,
       `${title}: ${lesson.text}`,
       lessonRows.filter(([otherTitle]) => otherTitle !== title).map(([otherTitle, otherLesson]) => ({
