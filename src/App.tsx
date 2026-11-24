@@ -49,20 +49,20 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-4 py-2 sm:px-5">
           <div className="flex min-h-10 items-center justify-between gap-3">
             <span className="font-serif text-lg font-bold">Stack<span className="text-accent">Ledger</span></span>
-            <span className="min-w-0 flex-1 truncate text-right text-sm text-muted md:hidden">{view === 'lang' ? (lang === 'python' ? 'Python' : 'C#') : NAV.find(([id]) => id === view)?.[1] ?? 'Overview'}</span>
+            <span className="min-w-0 flex-1 truncate text-right text-sm text-muted">{view === 'lang' ? (lang === 'python' ? 'Python' : 'C#') : NAV.find(([id]) => id === view)?.[1] ?? 'Overview'}</span>
             <button type="button" aria-expanded={navOpen} aria-controls="site-navigation" onClick={() => setNavOpen((open) => !open)}
-              className="min-h-10 shrink-0 rounded-lg border border-line bg-card px-3 text-sm font-semibold text-ink md:hidden">
+              className="min-h-10 shrink-0 rounded-lg border border-line bg-card px-3 text-sm font-semibold text-ink">
               {navOpen ? 'Close menu' : 'Menu'}
             </button>
           </div>
-          <div id="site-navigation" className={`${navOpen ? 'mt-3' : 'hidden'} md:mt-0 md:flex md:flex-wrap md:items-center md:gap-x-4`}>
+          <div id="site-navigation" className={`${navOpen ? 'mt-3 flex flex-wrap items-center gap-x-4 gap-y-2' : 'hidden'}`}>
             <ul className="flex min-w-0 flex-1 flex-wrap gap-1">
               {NAV.map(([id, label]) => (
                 <li key={id}><button onClick={() => { setView(id); setNavOpen(false); window.scrollTo(0, 0) }} aria-current={view === id ? 'page' : undefined}
                   className={`min-h-10 rounded-lg px-3 text-sm ${view === id ? 'bg-ink font-medium text-paper' : 'text-muted hover:bg-line/50 hover:text-ink'}`}>{id === 'lang' ? (lang === 'python' ? 'Python' : 'C#') : label}</button></li>
               ))}
             </ul>
-            <div className="mt-2 flex max-w-full flex-wrap items-center justify-between gap-3 md:ml-auto md:mt-0 md:justify-end">
+            <div className="flex max-w-full flex-wrap items-center justify-between gap-3">
               <div role="radiogroup" aria-label="Site language focus" className="flex shrink-0 rounded-full border border-line bg-card p-0.5">
                 {([['python', 'Python'], ['csharp', 'C#']] as const).map(([k, l]) => (
                   <button key={k} role="radio" aria-checked={lang === k} onClick={() => setLang(k)}
