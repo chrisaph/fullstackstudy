@@ -49,10 +49,10 @@ export default function Notebook({ notes, setNotes }: { notes: Note[]; setNotes:
           <h2 className="font-serif text-lg font-semibold">Categories</h2>
           <ul className="mt-3 space-y-2">
             {tags.map((c) => (
-              <li key={c} className="flex items-center gap-2">
-                <input aria-label={`Rename ${c}`} defaultValue={c} key={c} onBlur={(e) => { renameCat(c, e.target.value); e.target.value = c }} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} className="min-h-9 flex-1 rounded-lg border border-line bg-paper px-3 text-sm" />
-                <span className="w-16 text-xs text-muted">{notes.filter((n) => n.tag === c).length} notes</span>
-                <button onClick={() => setDelCat(c)} className="min-h-9 rounded-lg border border-line px-3 text-sm hover:border-accent hover:text-accent">Delete</button>
+              <li key={c} className="flex min-w-0 flex-wrap items-center gap-2">
+                <input aria-label={`Rename ${c}`} defaultValue={c} key={c} onBlur={(e) => { renameCat(c, e.target.value); e.target.value = c }} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} className="min-h-10 min-w-0 flex-1 basis-36 rounded-lg border border-line bg-paper px-3 text-sm" />
+                <span className="w-14 shrink-0 text-xs text-muted">{notes.filter((n) => n.tag === c).length} notes</span>
+                <button onClick={() => setDelCat(c)} className="min-h-10 shrink-0 rounded-lg border border-line px-3 text-sm hover:border-accent hover:text-accent">Delete</button>
               </li>
             ))}
           </ul>

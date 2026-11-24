@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { HOPS, COOKIE_STEPS, COOKIE_FLAGS, DEVTOOLS, SECURITY, SECRET_RESPONSE, UX, TOPICS, VARK, REVIEW_PROMPTS, type Level } from '../lib/data'
 import { PY_NOTES, CS_NOTES, useLang } from '../lib/lang'
 import { useLocal } from '../lib/store'
@@ -33,6 +33,8 @@ export default function Flashcards() {
   const [flip, setFlip] = useState(false)
   const [seed, setSeed] = useState(0)
   const [nq, setNq] = useState(''); const [na, setNa] = useState('')
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const skipClick = useRef(false)
 
   const cards = useMemo<FC[]>(() => {
     const out: FC[] = []
@@ -77,25 +79,40 @@ export default function Flashcards() {
   return (
     <>
       <Title kicker="Flashcards" title="Recall beats rereading." sub="Cards are built from every concept on this site, plus your own. Try to answer aloud before flipping, then rate yourself: weak cards come back first." />
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <select aria-label="Deck" value={deck} onChange={(e) => setDeck(e.target.value)} className="min-h-10 rounded-lg border border-line bg-card px-3 text-sm">{decks.map((d) => <option key={d}>{d}</option>)}</select>
+      <div className="mb-4 flex min-w-0 flex-wrap items-center gap-3">
+        <select aria-label="Deck" value={deck} onChange={(e) => setDeck(e.target.value)} className="min-h-10 max-w-full rounded-lg border border-line bg-card px-3 text-sm">{decks.map((d) => <option key={d}>{d}</option>)}</select>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={weak} onChange={(e) => setWeak(e.target.checked)} />Weak or new only</label>
         <Btn kind="ghost" onClick={() => { setSeed((s) => s + 1); setI(0); setFlip(false) }}>Shuffle</Btn>
-        <span className="ml-auto text-sm text-muted">{mastered} of {cards.length} mastered</span>
+        <span className="text-sm text-muted sm:ml-auto">{mastered} of {cards.length} mastered</span>
       </div>
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div>
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
           {cur ? (
             <>
-              <button onClick={() => setFlip(!flip)} aria-label="Flip card" className="block min-h-72 w-full rounded-2xl border border-line bg-card p-8 text-left transition hover:border-ink">
+              <button
+                onTouchStart={(event) => { touchStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY } }}
+                onTouchEnd={(event) => {
+                  if (!touchStart.current) return
+                  const dx = event.changedTouches[0].clientX - touchStart.current.x
+                  const dy = event.changedTouches[0].clientY - touchStart.current.y
+                  touchStart.current = null
+                  if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+                    skipClick.current = true
+                    window.setTimeout(() => { skipClick.current = false }, 350)
+                    if (dx < 0) next(); else prev()
+                  }
+                }}
+                onClick={() => { if (skipClick.current) { skipClick.current = false; return } setFlip((value) => !value) }}
+                aria-label="Flashcard. Tap to flip, swipe left for the next card or right for the previous card."
+                className="block min-h-[18rem] w-full min-w-0 touch-pan-y rounded-2xl border border-line bg-card p-4 text-left transition hover:border-ink sm:min-h-72 sm:p-8">
                 <p className="font-mono text-xs uppercase tracking-widest text-accent">{cur.deck} · {Math.min(i, queue.length - 1) + 1}/{queue.length} · box {box[cur.id] ?? 0}</p>
-                <p className="mt-6 font-serif text-2xl font-semibold leading-snug">{cur.q}</p>
+                <p className="mt-5 break-words font-serif text-xl font-semibold leading-snug sm:mt-6 sm:text-2xl">{cur.q}</p>
                 {flip ? (
-                  <div className="mt-6 border-t border-line pt-4"><p className="whitespace-pre-wrap">{cur.a}</p>
-                    {cur.code && <pre className="mt-3 overflow-x-auto rounded-lg bg-ink p-3 font-mono text-sm text-paper"><code>{cur.code}</code></pre>}</div>
-                ) : <p className="mt-6 text-sm text-muted">Click or press space to reveal the answer.</p>}
+                  <div className="mt-5 min-w-0 border-t border-line pt-4 sm:mt-6"><p className="whitespace-pre-wrap text-base leading-relaxed [overflow-wrap:anywhere] sm:text-lg">{cur.a}</p>
+                    {cur.code && <pre className="mt-3 max-w-full overflow-x-auto rounded-lg bg-ink p-3 font-mono text-sm text-paper"><code>{cur.code}</code></pre>}</div>
+                ) : <p className="mt-5 text-base text-muted sm:mt-6">Tap to reveal · swipe left or right to move</p>}
               </button>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:flex sm:flex-wrap sm:items-center">
                 <Btn kind="ghost" onClick={prev}>← Previous</Btn>
                 {flip ? (<>
                   <Btn kind="ghost" onClick={() => rate(0)}>1 · Again</Btn><Btn kind="ghost" onClick={() => rate(1)}>2 · Good</Btn><Btn onClick={() => rate(2)}>3 · Easy</Btn>
