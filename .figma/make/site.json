@@ -1,0 +1,10 @@
+{
+  "description": "A self-guided full-stack developer learning platform with VARK pathways, coding challenges, notebook prompts, and progress reviews to build practical skills.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
